@@ -29,18 +29,19 @@ func Manejadores(ctx context.Context, request events.APIGatewayProxyRequest) mod
 		switch ctx.Value(models.Key("path")).(string) {
 		case "registro":
 			return routers.Registro(ctx)
+		case "login":
+			return routers.Login(ctx)
 		}
 	case "GET":
 		switch ctx.Value(models.Key("path")).(string) {
-
+		case "verperfil":
+			return routers.VerPerfil(request)
 		}
 	case "PUT":
 		switch ctx.Value(models.Key("path")).(string) {
-
 		}
 	case "DELETE":
 		switch ctx.Value(models.Key("path")).(string) {
-
 		}
 	}
 
@@ -51,6 +52,8 @@ func Manejadores(ctx context.Context, request events.APIGatewayProxyRequest) mod
 
 func validoAuthorization(ctx context.Context, request events.APIGatewayProxyRequest) (bool, int, string, models.Claim) {
 	path := ctx.Value(models.Key("path")).(string)
+
+	// fmt.Println("> Pido path " + path)
 
 	//ninguno de etsos van a reuqerir token
 	if path == "registro" || path == "login" || path == "obtenerAvatar" || path == "obtenerBanner" {

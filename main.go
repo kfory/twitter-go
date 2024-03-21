@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"strings"
 	"twitter-go/awsgo"
@@ -33,12 +34,15 @@ func EjecutoLambda(ctx context.Context, request events.APIGatewayProxyRequest) (
 		}
 		return res, nil
 	}
+	// fmt.Println("Conexion prueba...", os.Getenv("SecretName"))
+	// fmt.Println("Conexion parametro...", err)
 
-	SecretModel, err := secretmanager.GetSecret(os.Getenv("secretName"))
+	SecretModel, err := secretmanager.GetSecret(os.Getenv("SecretName"))
+
 	if err != nil {
 		res = &events.APIGatewayProxyResponse{
 			StatusCode: 400,
-			Body:       "Error en la lectura de secret" + err.Error(),
+			Body:       "Error en la lectura de secret: " + err.Error(),
 			Headers: map[string]string{
 				"content-type": "application/json",
 			},
@@ -46,7 +50,10 @@ func EjecutoLambda(ctx context.Context, request events.APIGatewayProxyRequest) (
 		return res, nil
 	}
 
-	path := strings.Replace(request.PathParameters["twitter"], os.Getenv("UrlPrefix"), "", -1)
+	fmt.Println("> Pido request.PathParameters[] " + request.PathParameters["twittergo"])
+	fmt.Println("> Pido os.Getenv() " + os.Getenv("UrlPrefix"))
+
+	path := strings.Replace(request.PathParameters["twittergo"], os.Getenv("UrlPrefix"), "", -1)
 
 	awsgo.Ctx = context.WithValue(awsgo.Ctx, models.Key("path"), path)                          //establecer variables
 	awsgo.Ctx = context.WithValue(awsgo.Ctx, models.Key("method"), request.HTTPMethod)          //establecer variables
@@ -89,6 +96,7 @@ func EjecutoLambda(ctx context.Context, request events.APIGatewayProxyRequest) (
 
 func ValidoParametros() bool {
 	_, traeParametro := os.LookupEnv("SecretName")
+
 	if !traeParametro { //si no trae parametro (devuelve un false)
 		return traeParametro
 	}

@@ -15,6 +15,7 @@ func GetSecret(secretName string) (models.Secret, error) {
 	fmt.Println("> Pido secreto " + secretName)
 
 	svc := secretsmanager.NewFromConfig(awsgo.Ctg)
+
 	clave, err := svc.GetSecretValue(awsgo.Ctx, &secretsmanager.GetSecretValueInput{
 		SecretId: aws.String(secretName),
 	})
